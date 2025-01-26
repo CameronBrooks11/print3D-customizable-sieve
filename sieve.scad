@@ -6,7 +6,7 @@
  * @version 2.5.1
  * @description Formerly thing:2578935, based on Sieve (or Seive?) by pcstru (thing:341357).
  *
- * @TODO Further develop stackable rim feature to be compatible with all sieve shapes and test for compatibility.
+ * @TODO Further develop stackable holder to be compatible with all sieve shapes and taper.
  *
  */
 
@@ -304,10 +304,9 @@ module stackable_sieve_holder(od_x, od_y, rim_thick, rim_h, insert_allowance, ho
 }
 
 // Generate the sieve
-color("green")
-sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
-      strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
-      taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
+color("green") sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
+                     strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
+                     taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
 
 // Generate the stackable rim if requested
 if (stackable_rim == "yes")
