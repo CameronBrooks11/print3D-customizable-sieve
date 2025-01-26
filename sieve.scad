@@ -5,10 +5,12 @@
  * Version 2.5, 2023/08
  */
 
+/* [General] */
+
+// Choose the shape of the sieve. The heart shape is a bit of a gimmick, but it works.
 shape = "round"; // [round,square,heart]
 
-// All dimensions are in millimeters. For square shape, this is the length of one side. For heart shape, this is the
-// width and depth of the heart.
+// For square shape, this is the length of one side. For heart shape, this is the width and depth of the heart.
 outer_diameter = 40; //[5.0:.1:250.0]
 
 // Additional X dimension length for creating elongated shapes (rectangles or ellipses). Not applicable to heart shape.
@@ -36,6 +38,19 @@ rim_height = 3; //[0:.1:50]
 // Taper of the tube: scale factor of top versus bottom contour. Not applicable to heart shape.
 taper = 1; //[1:0.01:3]
 
+/* [Stacking Rim] */
+
+// Define the allowance to achieve the desired diameter clearance between the sieve and the rim for a snap fit
+snap_allowance = 0.3; // Range: [0:0.1:5]
+
+// Define the height allowance to to prevent seam gaps between the sieve and the rim for the snap fit
+height_allowance = 0.4; // Range: [0:0.1:5]
+
+// Add a stackable rim to the sieve, increases the total height of a single sieve by x3 the rim height
+stackable_rim = "no"; // [yes,no]
+
+/* [Advanced] */
+
 // If yes, the wires will be placed in different layers, which leads to a quicker and possibly better print, especially
 // when using thin strands.
 offset_strands = "yes"; // [yes,no]
@@ -49,11 +64,14 @@ lift_strands = 0; //[0.00:.01:2.00]
 shift_x = 0; //[0:1:99]
 shift_y = 0; //[0:1:99]
 
-// Number of segments for round shape, low values can be used to obtain polygons that fit inside a circle of the
-// specified outer diameter. For instance, 3 yields a triangle. Also affects heart shape.
+/*[Special Variables]*/
+
+// Segments for round shapes; lower values create polygons (e.g., 3 = triangle). Also affects heart shapes.
 $fn = 72; //[3:1:256]
 
 /* [Hidden] */
+
+zFite = $preview ? 0.1 : 0; // zFite is a small value to avoid z-fighting in the CSG preview
 shift_x_abs = (gap_size + strand_width) * shift_x / 100;
 shift_y_abs = (gap_size + strand_width) * shift_y / 100;
 
@@ -234,6 +252,57 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height,
     tube(or_x, or_y, rim_thick - .4, rim_height - upper_height, 1);
 }
 
-// Generate the sieve
-sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness, rim_height,
-      taper, offset_strands, shift_x_abs, shift_y_abs);
+// Module  : sieve_stackable_rim
+// Params :
+// 	od_x = outer X dimension of the cylinder or rectangle
+// 	od_y = outer Y dimension of the cylinder or rectangle
+// 	rim_thick = thickness of outer rim
+// 	rim_height = height of outer rim
+// 	snap_h_allowance = height allowance for snap fit
+// 	snap_rim_allowance = rim allowance for snap fit
+module sieve_stackable_rim(od_x, od_y, rim_thick, rim_height, snap_h_allowance, snap_rim_allowance)
+{
+
+    children();
+
+    translate([ 0, 0, rim_height ])
+    {
+        difference()
+        {
+            cylinder(d = outer_diameter, h = rim_height - snap_h_allowance);
+
+            translate([ 0, 0, -zFite / 2 ]) cylinder(d = outer_diameter - 2 * rim_thickness, h = rim_height + zFite);
+
+            translate([ 0, 0, -zFite / 2 ]) difference()
+            {
+                cylinder(d = outer_diameter + snap_rim_allowance, h = rim_height + zFite);
+                cylinder(d = outer_diameter - rim_thickness, h = rim_height);
+            }
+        }
+    }
+
+    translate([ 0, 0, -rim_height ])
+    {
+        difference()
+        {
+            cylinder(d = outer_diameter, h = rim_height);
+            translate([ 0, 0, -zFite / 2 ]) cylinder(d = outer_diameter - 2 * rim_thickness, h = rim_height + zFite);
+
+            translate([ 0, 0, -zFite / 2 ])
+                cylinder(d = outer_diameter - rim_thickness + snap_rim_allowance, h = rim_height + zFite);
+        }
+    }
+}
+
+if (stackable_rim == "no")
+    // Generate the sieve
+    sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness, rim_height,
+          taper, offset_strands, shift_x_abs, shift_y_abs);
+else
+    // Generate the stackable rim
+    sieve_stackable_rim(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness,
+                        rim_height = rim_height, snap_h_allowance = height_allowance,
+                        snap_rim_allowance = snap_allowance)
+        // Generate the sieve
+        sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness,
+              rim_height, taper, offset_strands, shift_x_abs, shift_y_abs);
