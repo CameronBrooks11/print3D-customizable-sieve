@@ -1,16 +1,18 @@
 # Customizable sieve / filter / strainer
-*3D printable parametric sieve / filter / strainer (formerly thing:2578935)*
+
+_3D printable parametric sieve / filter / strainer (formerly thing:2578935)_
 
 ### License
+
 [Creative Commons - Attribution](https://creativecommons.org/licenses/by/4.0/)
 
 ### Attribution
+
 Based on Sieve (or ‘Seive’) by pcstru ([Thingiverse thing:341357](https://www.thingiverse.com/thing:341357)).
 
 ### Gallery
 
 ![Photo 1](thumbs/filter0.jpg)[🔎](images/filter0.jpg) ![Comparison](thumbs/filter1.jpg)[🔎](images/filter1.jpg) ![Photo 2](thumbs/filter2.jpg)[🔎](images/filter2.jpg)
-
 
 ## Description and Instructions
 
@@ -19,19 +21,19 @@ This is an enhanced and customizable version of the [sieve by pcstru](https://ww
 Open the `.scad` file in [OpenSCAD](https://www.openscad.org/) and **[use the OpenSCAD Customizer](https://www.dr-lex.be/3d-printing/customizer.html)** to create a model with your own desired specifications.
 
 Compared to pcstru's original, this updated version has these extra features:
-* choose between round, square, or heart shapes;
-* option to make any regular polygon shape by reducing the number of circle segments. The polygon will fit inside a circle of the specified outer diameter (this means making a 4-sided polygon is not the same as selecting the ‘square’ shape);
-* ability to make a rectangular or elliptical shape with the `stretch` value to extend the shape in one direction (not applicable to heart shape);
-* optionally add a taper to create funnel-like filters (not applicable to heart shape);
-* there is a bit of extra overlap between the walls and grid, such that the grid should be well-attached to the rim even when using few or thin strands;
-* the grid is perfectly centered at all times, courtesy of my unstoppable urge for detail. (But, the origin can be adjusted if desired.)
+
+- choose between round, square, or heart shapes;
+- option to make any regular polygon shape by reducing the number of circle segments. The polygon will fit inside a circle of the specified outer diameter (this means making a 4-sided polygon is not the same as selecting the ‘square’ shape);
+- ability to make a rectangular or elliptical shape with the `stretch` value to extend the shape in one direction (not applicable to heart shape);
+- optionally add a taper to create funnel-like filters (not applicable to heart shape);
+- there is a bit of extra overlap between the walls and grid, such that the grid should be well-attached to the rim even when using few or thin strands;
+- the grid is perfectly centered at all times, courtesy of my unstoppable urge for detail. (But, the origin can be adjusted if desired.)
 
 You can opt to print the grid as one set of layers, i.e. a plane with holes in it, or to print two sets of strands on top of each other (‘offset’ option). The latter is easier and probably faster to print, and may yield a more accurate filter if hole size is important. The disadvantage is that dirt tends to stick to the filter more easily.
 
-You can also opt to lift the grid. This allows to print accurate filters with strands merely as wide as your nozzle diameter (see photos). Set the lift distance to your *first layer height* to ensure the filter only starts being printed at the *second* layer. This avoids that the strands get squished against the bed, or printed with a wider first layer extrusion, both of which would make the hole size inaccurate. You could also use a raft to the same effect, but it might be difficult to remove the filter form the raft without damaging it.
+You can also opt to lift the grid. This allows to print accurate filters with strands merely as wide as your nozzle diameter (see photos). Set the lift distance to your _first layer height_ to ensure the filter only starts being printed at the _second_ layer. This avoids that the strands get squished against the bed, or printed with a wider first layer extrusion, both of which would make the hole size inaccurate. You could also use a raft to the same effect, but it might be difficult to remove the filter form the raft without damaging it.
 
 The segments parameter also affects the heart shape, but you should use a multiple of 4 in this case to ensure a smooth and usable shape.
-
 
 ### Print settings
 
@@ -42,7 +44,6 @@ Both prints shown in the photos use 0.4 mm strands (with offset), and were lift
 For filters with narrow strands, you should ensure the extrusion width matches the strand width.
 
 If you are trying to print a filter with a fine mesh that is only 1 extrusion wide, and the mesh disappears entirely when slicing, ensure that slicer options similar to “detect thin walls” are enabled.
-
 
 ## Updates
 
@@ -73,6 +74,6 @@ Added grid rotation and heart shape (thanks to rixvet).
 
 Allow shifting the position of the grid; reduce rendering time of final mesh by generating less structures that will be trimmed anyhow.
 
-
 ## Tags
+
 `customizable`, `filter`, `grid`, `mesh`, `openscad`, `sieve`, `strainer`
