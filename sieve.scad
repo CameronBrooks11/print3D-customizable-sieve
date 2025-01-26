@@ -131,12 +131,12 @@ module flat_heart(r_x, r_y, thick, inside)
  * !=1).
  * @param inside 0: tube with inside volume removed, 1: inside volume of the tube, 2: inside and outside volume of tube.
  */
-module tube(r_x, r_y, thick, height, taper, inside = 0)
+module tube(r_x, r_y, thick, height, taper_scale, inside = 0)
 {
     if (shape == "round")
     {
         stretchx = r_x / r_y;
-        linear_extrude(height = height, convexity = 4, scale = taper)
+        linear_extrude(height = height, convexity = 4, scale = taper_scale)
         {
             if (inside == 0)
             {
@@ -162,7 +162,7 @@ module tube(r_x, r_y, thick, height, taper, inside = 0)
     }
     else
     {
-        linear_extrude(height = height, convexity = 4, scale = taper)
+        linear_extrude(height = height, convexity = 4, scale = taper_scale)
         {
             if (inside == 0)
             {
@@ -229,19 +229,19 @@ module grid(width, length, strand_width, strand_thick, gap, do_offset, sh_x, sh_
  * @param strand_thick Thickness of grid strands.
  * @param gap Gap between strands.
  * @param rim_thick Thickness of outer rim.
- * @param rim_height Height of outer rim.
- * @param taper Scale factor applied to the extrusion, applied to the entire shape (i.e. wall thickness will vary if
+ * @param rim_h Height of outer rim.
+ * @param taper_scale Scale factor applied to the extrusion, applied to the entire shape (wall thickness will vary if
  * !=1).
  * @param do_offset Offset the strands ("yes" or "no").
  * @param sh_x Shift the grid over this distance in the X direction.
  * @param sh_y Shift the grid over this distance in the Y direction.
  */
-module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height, taper, do_offset, sh_x, sh_y)
+module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_h, taper_scale, do_offset, sh_x, sh_y)
 {
     or_x = od_x / 2;
     or_y = od_y / 2;
-    upper_height = (do_offset == "yes") ? rim_height - 2 * strand_thick - lift_strands + .01
-                                        : rim_height - strand_thick - lift_strands + .01;
+    upper_height = (do_offset == "yes") ? rim_h - 2 * strand_thick - lift_strands + .01
+                                        : rim_h - strand_thick - lift_strands + .01;
     upper_start = (do_offset == "yes") ? 2 * strand_thick - .01 : strand_thick - .01;
 
     // Add .01 margin to ensure good overlap, avoid non-manifold
@@ -257,13 +257,13 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height,
         {
             rotate([ 0, 0, grid_rotation ])
                 grid(od_y * 1.2, od_x * 1.2, strand_width, strand_thick, gap, do_offset, sh_x, sh_y);
-            translate([ 0, 0, -.01 ]) tube(or_x, or_y, .1, rim_height + 2 * strand_thick + .1, 1, 1);
+            translate([ 0, 0, -.01 ]) tube(or_x, or_y, .1, rim_h + 2 * strand_thick + .1, 1, 1);
         }
 
-        translate([ 0, 0, upper_start ]) tube(or_x, or_y, rim_thick, upper_height, taper);
+        translate([ 0, 0, upper_start ]) tube(or_x, or_y, rim_thick, upper_height, taper_scale);
     }
 
-    tube(or_x, or_y, rim_thick - .4, rim_height - upper_height, 1);
+    tube(or_x, or_y, rim_thick - .4, rim_h - upper_height, 1);
 }
 
 /**
@@ -272,53 +272,53 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height,
  * @param od_x Outer X dimension of the cylinder or rectangle.
  * @param od_y Outer Y dimension of the cylinder or rectangle.
  * @param rim_thick Thickness of outer rim.
- * @param rim_height Height of outer rim.
+ * @param rim_h Height of outer rim.
  * @param snap_h_allowance Height allowance for snap fit.
  * @param snap_rim_allowance Rim allowance for snap fit.
  */
-module sieve_stackable_rim(od_x, od_y, rim_thick, rim_height, snap_h_allowance, snap_rim_allowance)
+module sieve_stackable_rim(od_x, od_y, rim_thick, rim_h, snap_h_allowance, snap_rim_allowance)
 {
 
     children();
 
-    translate([ 0, 0, rim_height ])
+    translate([ 0, 0, rim_h ])
     {
         difference()
         {
-            cylinder(d = outer_diameter, h = rim_height - snap_h_allowance);
+            cylinder(d = od_x, h = rim_h - snap_h_allowance);
 
-            translate([ 0, 0, -zFite / 2 ]) cylinder(d = outer_diameter - 2 * rim_thickness, h = rim_height + zFite);
+            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - 2 * rim_thick, h = rim_h + zFite);
 
             translate([ 0, 0, -zFite / 2 ]) difference()
             {
-                cylinder(d = outer_diameter + snap_rim_allowance, h = rim_height + zFite);
-                cylinder(d = outer_diameter - rim_thickness, h = rim_height);
+                cylinder(d = od_x + snap_rim_allowance, h = rim_h + zFite);
+                cylinder(d = od_x - rim_thick, h = rim_h);
             }
         }
     }
 
-    translate([ 0, 0, -rim_height ])
+    translate([ 0, 0, -rim_h ])
     {
         difference()
         {
-            cylinder(d = outer_diameter, h = rim_height);
-            translate([ 0, 0, -zFite / 2 ]) cylinder(d = outer_diameter - 2 * rim_thickness, h = rim_height + zFite);
+            cylinder(d = od_x, h = rim_h);
+            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - 2 * rim_thick, h = rim_h + zFite);
 
-            translate([ 0, 0, -zFite / 2 ])
-                cylinder(d = outer_diameter - rim_thickness + snap_rim_allowance, h = rim_height + zFite);
+            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - rim_thick + snap_rim_allowance, h = rim_h + zFite);
         }
     }
 }
 
 if (stackable_rim == "no")
     // Generate the sieve
-    sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness, rim_height,
-          taper, offset_strands, shift_x_abs, shift_y_abs);
+    sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
+          strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
+          taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
 else
     // Generate the stackable rim
-    sieve_stackable_rim(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness,
-                        rim_height = rim_height, snap_h_allowance = snap_height_allowance,
-                        snap_rim_allowance = snap_dia_allowance)
+    sieve_stackable_rim(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness, rim_h = rim_height,
+                        snap_h_allowance = snap_height_allowance, snap_rim_allowance = snap_dia_allowance)
         // Generate the sieve
-        sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness,
-              rim_height, taper, offset_strands, shift_x_abs, shift_y_abs);
+        sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
+              strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
+              taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
