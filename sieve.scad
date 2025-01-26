@@ -45,11 +45,14 @@ taper = 1; //[1:0.01:3]
 
 /* [Stacking Rim] */
 
-// Define the allowance to achieve the desired diameter clearance between the sieve and the rim for a snap fit
-snap_dia_allowance = 0.3; // Range: [0:0.1:5]
+// Define the allowance to achieve the desired diameter clearance between the sieve and the stackable collar
+sieve_insert_allowance = 0.5;
 
-// Define the height allowance to to prevent seam gaps between the sieve and the rim for the snap fit
-snap_height_allowance = 0.4; // Range: [0:0.1:5]
+// Define the allowance to achieve the desired diameter clearance between the sieve and the rim for a holder fit
+holder_dia_allowance = 0.3; // Range: [0:0.1:5]
+
+// Define the height allowance to to prevent seam gaps between the sieve and the rim for the holder fit
+holder_height_allowance = 0.4; // Range: [0:0.1:5]
 
 // Currently only works for round! Adds a stackable rim to the sieve the height of the rim on both sides
 stackable_rim = "no"; // [yes,no]
@@ -267,58 +270,49 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_h, tape
 }
 
 /**
- * @brief Generates a stackable rim for the sieve to allow for snap fit stacking.
+ * @brief Generates a sieve holder with a stackable rim.
  * @details Currently only works for round shapes!
  * @param od_x Outer X dimension of the cylinder or rectangle.
  * @param od_y Outer Y dimension of the cylinder or rectangle.
  * @param rim_thick Thickness of outer rim.
  * @param rim_h Height of outer rim.
- * @param snap_h_allowance Height allowance for snap fit.
- * @param snap_rim_allowance Rim allowance for snap fit.
+ * @param holder_h_allowance Height allowance for holder fit.
+ * @param holder_rim_allowance Rim allowance for holder fit.
  */
-module sieve_stackable_rim(od_x, od_y, rim_thick, rim_h, snap_h_allowance, snap_rim_allowance)
+module stackable_sieve_holder(od_x, od_y, rim_thick, rim_h, insert_allowance, holder_h_allowance, holder_rim_allowance,
+                              taper_scale)
 {
 
-    children();
+    or_x = od_x / 2 + rim_thick + insert_allowance / 2;
+    or_y = od_y / 2 + rim_thick + insert_allowance / 2;
 
-    translate([ 0, 0, rim_h ])
+    translate([ 0, 0, -rim_h - zFite ]) union()
     {
-        difference()
-        {
-            cylinder(d = od_x, h = rim_h - snap_h_allowance);
+        tube(or_x, or_y, rim_thick, rim_h * 2, taper_scale);
 
-            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - 2 * rim_thick, h = rim_h + zFite);
+        // rim to sit upon
+        tube(od_x / 2 + insert_allowance / 2, od_y / 2 + insert_allowance / 2, rim_thick + insert_allowance, rim_h,
+             taper_scale);
 
-            translate([ 0, 0, -zFite / 2 ]) difference()
-            {
-                cylinder(d = od_x + snap_rim_allowance, h = rim_h + zFite);
-                cylinder(d = od_x - rim_thick, h = rim_h);
-            }
-        }
-    }
+        // male holder
+        translate([ 0, 0, rim_h * 2 ]) difference()
+            tube(or_x - rim_thick / 2, or_y - rim_thick / 2, rim_thick / 2, rim_h, taper_scale);
 
-    translate([ 0, 0, -rim_h ])
-    {
-        difference()
-        {
-            cylinder(d = od_x, h = rim_h);
-            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - 2 * rim_thick, h = rim_h + zFite);
-
-            translate([ 0, 0, -zFite / 2 ]) cylinder(d = od_x - rim_thick + snap_rim_allowance, h = rim_h + zFite);
-        }
+        // female holder
+        translate([ 0, 0, -rim_h ]) tube(or_x, or_y, rim_thick / 2 - holder_rim_allowance, rim_h, taper_scale);
     }
 }
 
-if (stackable_rim == "no")
-    // Generate the sieve
-    sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
-          strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
-          taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
-else
-    // Generate the stackable rim
-    sieve_stackable_rim(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness, rim_h = rim_height,
-                        snap_h_allowance = snap_height_allowance, snap_rim_allowance = snap_dia_allowance)
-        // Generate the sieve
-        sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
-              strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
-              taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
+// Generate the sieve
+sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
+      strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
+      taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
+
+// Generate the stackable rim if requested
+if (stackable_rim == "yes")
+{
+    color("blue") stackable_sieve_holder(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness,
+                                         rim_h = rim_height, insert_allowance = sieve_insert_allowance,
+                                         holder_h_allowance = holder_height_allowance,
+                                         holder_rim_allowance = holder_dia_allowance, taper_scale = taper);
+}
