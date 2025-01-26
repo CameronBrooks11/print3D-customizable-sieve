@@ -57,6 +57,12 @@ $fn = 72; //[3:1:256]
 shift_x_abs = (gap_size + strand_width) * shift_x / 100;
 shift_y_abs = (gap_size + strand_width) * shift_y / 100;
 
+// Module  : flat_heart
+// Params :
+// 	r_x = radius in X direction
+// 	r_y = radius in Y direction
+// 	thick = thickness of the heart
+// 	inside = 0: heart with inside volume removed, 1: inside volume of the heart
 module flat_heart(r_x, r_y, thick, inside)
 {
     // radius + 2 * square
@@ -92,10 +98,13 @@ module flat_heart(r_x, r_y, thick, inside)
 }
 
 // A tube:
-// - hollow if inside == 0,
-// - the inside volume if inside == 1,
-// - else the outside volume.
-// Taper applies to the entire shape, so wall thickness will vary if taper != 1.
+// Params:
+// 	r_x = radius in X direction
+// 	r_y = radius in Y direction
+// 	thick = thickness of the tube
+// 	height = height of the tube
+// 	taper = scale factor applied to the extrusion, applied to the entire shape (i.e. wall thickness will vary if !=1)
+// 	inside = 0: tube with inside volume removed, 1: inside volume of the tube, 2: inside and outside volume of tube
 module tube(r_x, r_y, thick, height, taper, inside = 0)
 {
     if (shape == "round")
@@ -149,7 +158,15 @@ module tube(r_x, r_y, thick, height, taper, inside = 0)
     }
 }
 
-// Grid
+// Module  : grid
+// Params :
+// 	width = width of the grid
+// 	length = length of the grid
+// 	strand_width = width of grid strands
+// 	strand_thick = thickness of grid strands
+// 	gap = gap between strands
+// 	do_offset = offset the strands (true or false)
+// 	sh_x and sh_y = shift the grid over these distances
 module grid(width, length, strand_width, strand_thick, gap, do_offset, sh_x, sh_y)
 {
     wh = width / 2;
@@ -187,8 +204,6 @@ module grid(width, length, strand_width, strand_thick, gap, do_offset, sh_x, sh_
 // 	rim_height = height of outer rim
 // 	do_offset = offset the strands ("yes" or "no")
 // 	sh_x and sh_y = shift the grid over these distances
-//
-//
 module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height, taper, do_offset, sh_x, sh_y)
 {
     or_x = od_x / 2;
@@ -219,5 +234,6 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height,
     tube(or_x, or_y, rim_thick - .4, rim_height - upper_height, 1);
 }
 
+// Generate the sieve
 sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness, rim_height,
       taper, offset_strands, shift_x_abs, shift_y_abs);
