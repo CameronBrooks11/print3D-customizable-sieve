@@ -1,19 +1,6 @@
 {
-    "fileFormatVersion": "1",
     "parameterSets": {
-        "Example1": {
-            "$fn": "72",
-            "gap_size": "1.2",
-            "lift_strands": "0",
-            "offset_strands": "yes",
-            "outer_diameter": "40",
-            "rim_height": "3",
-            "rim_thickness": "2",
-            "shape": "square",
-            "strand_thickness": "0.4",
-            "strand_width": "0.8"
-        },
-        "Example2": {
+        "Simple Example": {
             "$fn": "128",
             "gap_size": "1",
             "lift_strands": "0.25",
@@ -22,6 +9,8 @@
             "rim_height": "3",
             "rim_thickness": "1.7",
             "shape": "round",
+            "snap_dia_allowance": "0.3",
+            "snap_height_allowance": "0.4",
             "strand_thickness": "0.4",
             "strand_width": "0.4"
         },
@@ -34,6 +23,8 @@
             "rim_height": "1.2",
             "rim_thickness": "1.47",
             "shape": "round",
+            "snap_dia_allowance": "0.3",
+            "snap_height_allowance": "0.4",
             "strand_thickness": "0.4",
             "strand_width": "0.4"
         },
@@ -46,6 +37,8 @@
             "rim_height": "20",
             "rim_thickness": "1.47",
             "shape": "round",
+            "snap_dia_allowance": "0.3",
+            "snap_height_allowance": "0.4",
             "strand_thickness": "0.4",
             "strand_width": "0.4",
             "stretch": "0",
@@ -61,10 +54,13 @@
             "rim_height": "3",
             "rim_thickness": "1.2",
             "shape": "heart",
+            "snap_dia_allowance": "0.3",
+            "snap_height_allowance": "0.4",
             "strand_thickness": "0.4",
             "strand_width": "0.4",
             "stretch": "0",
             "taper": "1"
         }
-    }
+    },
+    "fileFormatVersion": "1"
 }

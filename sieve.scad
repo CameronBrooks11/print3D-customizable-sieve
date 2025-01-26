@@ -1,8 +1,13 @@
-/* Customizable sieve by DrLex and contributors, formerly thing:2578935
- * based on Sieve (or Seive?) by pcstru (thing:341357).
- * Released under Creative Commons - Attribution - Share Alike license
- * https://github.com/DrLex0/print3D-customizable-sieve
- * Version 2.5, 2023/08
+/**
+ * @file sieve.scad
+ * @brief A customizable sieve for filtering particles from liquids or powders or small solid objects.
+ * @author DrLex (c) 2023, Cameron K. Brooks (c) 2025, and contributors
+ * @license Creative Commons - Attribution - Share Alike
+ * @version 2.5.1
+ * @description Formerly thing:2578935, based on Sieve (or Seive?) by pcstru (thing:341357).
+ *
+ * @TODO Further develop stackable rim feature to be compatible with all sieve shapes and test for compatibility.
+ *
  */
 
 /* [General] */
@@ -41,12 +46,12 @@ taper = 1; //[1:0.01:3]
 /* [Stacking Rim] */
 
 // Define the allowance to achieve the desired diameter clearance between the sieve and the rim for a snap fit
-snap_allowance = 0.3; // Range: [0:0.1:5]
+snap_dia_allowance = 0.3; // Range: [0:0.1:5]
 
 // Define the height allowance to to prevent seam gaps between the sieve and the rim for the snap fit
-height_allowance = 0.4; // Range: [0:0.1:5]
+snap_height_allowance = 0.4; // Range: [0:0.1:5]
 
-// Add a stackable rim to the sieve, increases the total height of a single sieve by x3 the rim height
+// Currently only works for round! Adds a stackable rim to the sieve the height of the rim on both sides
 stackable_rim = "no"; // [yes,no]
 
 /* [Advanced] */
@@ -75,12 +80,13 @@ zFite = $preview ? 0.1 : 0; // zFite is a small value to avoid z-fighting in the
 shift_x_abs = (gap_size + strand_width) * shift_x / 100;
 shift_y_abs = (gap_size + strand_width) * shift_y / 100;
 
-// Module  : flat_heart
-// Params :
-// 	r_x = radius in X direction
-// 	r_y = radius in Y direction
-// 	thick = thickness of the heart
-// 	inside = 0: heart with inside volume removed, 1: inside volume of the heart
+/**
+ * @brief Generates a flat heart shape with a hole in the center.
+ * @param r_x Radius in X direction.
+ * @param r_y Radius in Y direction.
+ * @param thick Thickness of the heart.
+ * @param inside 0: heart with inside volume removed, 1: inside volume of the heart.
+ */
 module flat_heart(r_x, r_y, thick, inside)
 {
     // radius + 2 * square
@@ -115,14 +121,16 @@ module flat_heart(r_x, r_y, thick, inside)
     }
 }
 
-// A tube:
-// Params:
-// 	r_x = radius in X direction
-// 	r_y = radius in Y direction
-// 	thick = thickness of the tube
-// 	height = height of the tube
-// 	taper = scale factor applied to the extrusion, applied to the entire shape (i.e. wall thickness will vary if !=1)
-// 	inside = 0: tube with inside volume removed, 1: inside volume of the tube, 2: inside and outside volume of tube
+/**
+ * @brief Generates a tube shape with the option to remove the inside volume.
+ * @param r_x Radius in X direction.
+ * @param r_y Radius in Y direction.
+ * @param thick Thickness of the tube.
+ * @param height Height of the tube.
+ * @param taper Scale factor applied to the extrusion, applied to the entire shape (i.e. wall thickness will vary if
+ * !=1).
+ * @param inside 0: tube with inside volume removed, 1: inside volume of the tube, 2: inside and outside volume of tube.
+ */
 module tube(r_x, r_y, thick, height, taper, inside = 0)
 {
     if (shape == "round")
@@ -176,15 +184,17 @@ module tube(r_x, r_y, thick, height, taper, inside = 0)
     }
 }
 
-// Module  : grid
-// Params :
-// 	width = width of the grid
-// 	length = length of the grid
-// 	strand_width = width of grid strands
-// 	strand_thick = thickness of grid strands
-// 	gap = gap between strands
-// 	do_offset = offset the strands (true or false)
-// 	sh_x and sh_y = shift the grid over these distances
+/**
+ * @brief Generates a grid pattern with the option to offset the strands.
+ * @param width Width of the grid.
+ * @param length Length of the grid.
+ * @param strand_width Width of grid strands.
+ * @param strand_thick Thickness of grid strands.
+ * @param gap Gap between strands.
+ * @param do_offset Offset the strands (true or false).
+ * @param sh_x Shift the grid over this distance in the X direction.
+ * @param sh_y Shift the grid over this distance in the Y direction.
+ */
 module grid(width, length, strand_width, strand_thick, gap, do_offset, sh_x, sh_y)
 {
     wh = width / 2;
@@ -211,17 +221,21 @@ module grid(width, length, strand_width, strand_thick, gap, do_offset, sh_x, sh_
     }
 }
 
-// Module  : Sieve
-// Params :
-// 	od_x = outer X dimension of the cylinder or rectangle
-// 	od_y = outer Y dimension of the cylinder or rectangle
-// 	strand_width = width of grid strands
-// 	strand_thick = thickness of grid strands
-// 	gap = gap between strands
-// 	rim_thick = thickness of outer rim
-// 	rim_height = height of outer rim
-// 	do_offset = offset the strands ("yes" or "no")
-// 	sh_x and sh_y = shift the grid over these distances
+/**
+ * @brief Generates a sieve for filtering particles from liquids or powders or small solid objects.
+ * @param od_x Outer X dimension of the cylinder or rectangle.
+ * @param od_y Outer Y dimension of the cylinder or rectangle.
+ * @param strand_width Width of grid strands.
+ * @param strand_thick Thickness of grid strands.
+ * @param gap Gap between strands.
+ * @param rim_thick Thickness of outer rim.
+ * @param rim_height Height of outer rim.
+ * @param taper Scale factor applied to the extrusion, applied to the entire shape (i.e. wall thickness will vary if
+ * !=1).
+ * @param do_offset Offset the strands ("yes" or "no").
+ * @param sh_x Shift the grid over this distance in the X direction.
+ * @param sh_y Shift the grid over this distance in the Y direction.
+ */
 module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height, taper, do_offset, sh_x, sh_y)
 {
     or_x = od_x / 2;
@@ -252,14 +266,16 @@ module sieve(od_x, od_y, strand_width, strand_thick, gap, rim_thick, rim_height,
     tube(or_x, or_y, rim_thick - .4, rim_height - upper_height, 1);
 }
 
-// Module  : sieve_stackable_rim
-// Params :
-// 	od_x = outer X dimension of the cylinder or rectangle
-// 	od_y = outer Y dimension of the cylinder or rectangle
-// 	rim_thick = thickness of outer rim
-// 	rim_height = height of outer rim
-// 	snap_h_allowance = height allowance for snap fit
-// 	snap_rim_allowance = rim allowance for snap fit
+/**
+ * @brief Generates a stackable rim for the sieve to allow for snap fit stacking.
+ * @details Currently only works for round shapes!
+ * @param od_x Outer X dimension of the cylinder or rectangle.
+ * @param od_y Outer Y dimension of the cylinder or rectangle.
+ * @param rim_thick Thickness of outer rim.
+ * @param rim_height Height of outer rim.
+ * @param snap_h_allowance Height allowance for snap fit.
+ * @param snap_rim_allowance Rim allowance for snap fit.
+ */
 module sieve_stackable_rim(od_x, od_y, rim_thick, rim_height, snap_h_allowance, snap_rim_allowance)
 {
 
@@ -301,8 +317,8 @@ if (stackable_rim == "no")
 else
     // Generate the stackable rim
     sieve_stackable_rim(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness,
-                        rim_height = rim_height, snap_h_allowance = height_allowance,
-                        snap_rim_allowance = snap_allowance)
+                        rim_height = rim_height, snap_h_allowance = snap_height_allowance,
+                        snap_rim_allowance = snap_dia_allowance)
         // Generate the sieve
         sieve(outer_diameter + stretch, outer_diameter, strand_width, strand_thickness, gap_size, rim_thickness,
               rim_height, taper, offset_strands, shift_x_abs, shift_y_abs);
