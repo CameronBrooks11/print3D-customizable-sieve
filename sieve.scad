@@ -46,7 +46,7 @@ taper = 1; //[1:0.01:3]
 /* [Stacking Rim] */
 
 // Define the allowance to achieve the desired diameter clearance between the sieve and the stackable collar
-sieve_insert_allowance = 0.5;
+holder_insert_allowance = 0.5;
 
 // Define the allowance to achieve the desired diameter clearance between the sieve and the rim for a holder fit
 holder_dia_allowance = 0.3; // Range: [0:0.1:5]
@@ -304,6 +304,7 @@ module stackable_sieve_holder(od_x, od_y, rim_thick, rim_h, insert_allowance, ho
 }
 
 // Generate the sieve
+color("green")
 sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = strand_width,
       strand_thick = strand_thickness, gap = gap_size, rim_thick = rim_thickness, rim_h = rim_height,
       taper_scale = taper, do_offset = offset_strands, sh_x = shift_x_abs, sh_y = shift_y_abs);
@@ -312,7 +313,7 @@ sieve(od_x = outer_diameter + stretch, od_y = outer_diameter, strand_width = str
 if (stackable_rim == "yes")
 {
     color("blue") stackable_sieve_holder(od_x = outer_diameter, od_y = outer_diameter, rim_thick = rim_thickness,
-                                         rim_h = rim_height, insert_allowance = sieve_insert_allowance,
+                                         rim_h = rim_height, insert_allowance = holder_insert_allowance,
                                          holder_h_allowance = holder_height_allowance,
                                          holder_rim_allowance = holder_dia_allowance, taper_scale = taper);
 }
